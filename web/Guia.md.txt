@@ -1,0 +1,38 @@
+# Guia para pruebas y simulacros
+
+A continuacion se describe una serie de pasos a realizar al momento de realizar una prueba o un simulacro con las aplicaciones de auditoria.
+
+## Configuración
+
+ 1. Configurar base de datos: para esto hay que modificar el archivo en ./dependencias/DBCon.php
+ 2. Instalar mpdf. Dentro de la misma carpeta (./dependencias) instalar la libreria mpdf con el comando `composer require mpdf/mpdf`
+
+Adicional a estas configuraciones, es necesario cambiar algunos módulos para su correcto funcionamiento. Los cambios van de la mano con los requerimientos del IETAM.
+
+ 1. Editar script de descarga de base de datos (url y nombre del archivo de la base de datos)
+ 2. Editar script de descarga de log (url y nombre del archivo del log. Este nombre sigue un patron)
+ 3. Editar script de descarga de actas (url, nombres, carpetas, formato de nombre, etc). Este escript se encuentra en la carpeta **descargarActas/w1.php** 
+
+## Actividades durante toda la jornada
+
+ - Durante un simulacro se realiza la verificacion de las aplicaciones
+   mediante los jar. Este proceso se realiza 4 veces en la jornada.
+ - Descargar el log del sistema, cada 15 minutos con el script en **obtenerlog/consumir_web_Service.php**
+ - Descargar BD cada 15 minutos con **../ScriptDescargaDB/ejecutable.sh**
+ - Descargar actas cada 15 minutos con **descargarActas/w1.php** (se puede copiar para )
+ - Generar reportes de constancia de hechos (3 en total).
+
+## Actividades después de la jornada
+
+
+ 1. Subir el último backup de la bd a la BD local para su análisis. Es posible que sean necesarios cambios en los nombres de las tablas.
+ 2. Analizar actas descargadas con **analizarActas/** (hay que cambiar el número total de actas esperadas y el nombre y fecha del simulacro para generar los reportes)
+ 3. Utilizar el ultimo json para analizar la jornada electoral usando **AnalisisJE/**
+
+
+### Crontab para tareas cada 15 minutos
+ - Para descargar log: `*/15  * * * * curl -O http://auditoria.tamps.cinvestav.mx/Auditoria2021/obtenerLog/consumir_web_service.php`
+
+ - Para descargar bd: `*/15  * * * * "cd /home/armando/auditoria/ScriptDescargaDB/; ./ejecutable"`
+
+ - Para descarga de actas: `curl -O http://auditoria.tamps.cinvestav.mx/Auditoria2021/descargarActas/w1.php`
