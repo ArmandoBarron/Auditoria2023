@@ -46,17 +46,12 @@
     }
 
 
-    $representantePREP  = "<Representante>";
-    $cargoPREP = " Titular de la Instancia Interna Responsable de Coordinar las Actividades del SIVE";
+    $representanteINE = "Ing. Yuri Adrián González Robles";
+    $cargoINE = " Director de Seguridad y Control Informático Unidad Técnica de Servicios de Informática del Instituto Nacional Electoral";
 
-    $representanteCinvestav = "<Representante>";
-    $cargoCinvestav = "Ente Auditor";
+    $representanteCinvestav = "Dr. Arturo Díaz Pérez";
+    $cargoCinvestav = "Investigador Cinvestav 3C del Centro de Investigación y de Estudios Avanzados del Instituto Politécnico Nacional";
 
-    $representanteIETAM = "<Representante>";
-    $cargoIETAM = "Consejero Presidente del Instituto Nacional Electoral";
-
-    $representanteOESPREP = "<Representante>";
-    $cargoOESPREP="Presidente de la Comisión Especial de Seguimiento a la Implementación y Operación del SIVEI";
 
 //casos especiales
 $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "BaseDeDatos.sql","Backup.bak","Backup.sql","basededatos.bak","script.sql", "script.bak");
@@ -68,27 +63,24 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
 
 
 
-    <p align="right"> <?php echo "Ciudad Victoria, Tamaulipas, $dia de $m de $anio"; ?></p>
-    <h2 align="center">Constancia de hechos de la validación de los programas y de la base de datos del SIVEI.</h2>
+    <p align="right"> <?php echo "Toluca, Estado de México, $dia de $m de $anio"; ?></p>
+    <h2 align="center">Constancia de hechos de la validación de los programas y de la bases de datos del SIVEI.</h2>
 
     <?php
         echo "
         <p align='justify'>Siendo las $hora horas con $min minutos del día $dia del mes de $m del año $anio y, en cumplimiento 
         al numeral 38, del Anexo 21.2 \"LINEAMIENTOS DEL VOTO ELECTRÓNICO POR INTERNET PARA LAS MEXICANAS Y LOS MEXICANOS RESIDENTES EN EL EXTRANJERO\", el cual 
-        menciona que se deberá ejecutar el procedimiento de validación de los componentes del SIVEI, el cual consiste en generar los códigos de integridad de los componentes, con la finalidad de comprobar que estos se mantuvieron íntegros durante la operación del SIVEI en todas sus etapas; se procedió a realizar la validación de los módulos funcionales y bases de datos del SIVEI.</p>
+        menciona que se deberá ejecutar el procedimiento de validación de los componentes del SIVEI, el cual consiste en generar los códigos de integridad de los componentes, con la finalidad de comprobar que estos se mantuvieron íntegros durante la operación del SIVEI en todas sus etapas; así como en el marco del convenio INE/DJ/5/2023 celebrado entre el Instituto Nacional Electoral (INE) y el Centro de Investigación y Estudios Avanzados del Instituto Politécnico Nacional (CINVESTAV); se procedió a realizar la validación de los módulos funcionales y bases de datos del SIVEI.</p>
 
-        <p align='justify'>Dicha validación consistió en comparar las huellas criptográficas obtenidas a partir de la versión auditada del sistema 
-        respecto a las huellas criptográficas del mismo, minutos antes de iniciar la Jornada Electoral.</p>
+        <p align='justify'>Dicha validación consistió en comparar las huellas criptográficas obtenidas a partir de la versión auditada del sistema respecto a las huellas criptográficas del mismo, minutos antes de iniciar la Jornada Electoral.</p>
         
-        <p align='justify'>Para esta validación se contó con la presencia del $representanteIETAM en su calidad de $cargoIETAM, del $representanteCinvestav por parte del Cinvestav en su calidad de $cargoCinvestav, del $representanteOESPREP en su calidad de $cargoOESPREP, y el $representantePREP en su calidad de $cargoPREP.
+        <p align='justify'>Para esta validación se contó con la presencia en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez.
         </p>";
     
     
         /* Se Genera la tabla*/
         if (($fichero = fopen($_FILES['archivo']['tmp_name'], "r")) !== FALSE) {
-            echo"<p align='justify'> A continuación, se muestran los componentes sujetos a este procedimiento, acompañados del nombre del archivo, 
-            la huella criptográfica original (SHA3-256 inicial), la huella criptográfica minutos antes de iniciar la jornada electoral (SHA3-256 inicial) 
-            y el resultado de la comparación.</p><br>";
+            echo"<p align='justify'>A continuación, se muestran los componentes sujetos a este procedimiento, acompañados del nombre del archivo, la huella criptográfica original (SHA3-256 inicial), la huella criptográfica minutos antes de iniciar la jornada electoral (SHA3-256 inicial) y el resultado de la comparación.</p><br>";
             $i=1;
             $incorrectos=0;
             $total=0;
@@ -192,21 +184,17 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
         </tr>
         <tr>
             <td style="width:34.3%;height:auto" >hashes.sh</td>
-            <td style="width:34.3%;height:auto">Script de generacion de hash</td>
+            <td style="width:34.3%;height:auto">Script de generacion de hash de los componentes que se encuentran en la infraestructura.</td>
         </tr>
         <tr>
-            <td style="width:34.3%;height:auto" >hashes1.txt</td>
-            <td style="width:34.3%;height:auto">ALista de hashes generada por la aplicacion hashes.sh.</td>
+            <td style="width:34.3%;height:auto" >hashes_inventario.txt</td>
+            <td style="width:34.3%;height:auto">Lista de hashes generada por la aplicacion hashes.sh.</td>
         </tr>
     </table>
 
 
-
-    <p align='justify'>Firman la presente constancia los representantes de las entidades que intervienen, 
-    el <?php echo "$representanteIETAM"; ?> en su calidad de <?php echo "$cargoIETAM";?>,
-    el <?php echo "$representanteCinvestav"; ?> por parte del Cinvestav en su calidad de <?php echo "$cargoCinvestav"; ?>,
-    el <?php echo "$representanteOESPREP"; ?> en su calidad de <?php echo "$cargoOESPREP";?>,
-    y el <?php echo "$representantePREP"; ?>  en su calidad de <?php echo "$cargoPREP."; ?> </p>
+    <p align='justify'>Firman la presente constancia los representantes de las entidades que intervienen, en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez
+    </p>
 
 
 <br>
@@ -219,27 +207,14 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
             <td style="width:50%;height:auto" align="center">_________________________________</td>
         </tr>
         <tr>
-            <td style="width:50%;height:auto;font-size: 11px;" align="center"> <?php echo "$representanteIETAM"; ?> </td>
-            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$representanteOESPREP"; ?> </td>
+            <td style="width:50%;height:auto;font-size: 11px;" align="center"> <?php echo "$representanteINE"; ?> </td>
+            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$representanteCinvestav"; ?> </td>
         </tr>
         <tr>
-            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$cargoIETAM"; ?> </td>
-            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$cargoOESPREP"; ?> </td>
-        </tr>
-        <br><br><br><br>
-        <tr>
-            <td style="width:50%;height:auto" align="center">_________________________________</td>
-            <td style="width:50%;height:auto" align="center">_________________________________</td>
-        </tr>
-        <tr>
-            <td style="width:50%;height:auto;font-size: 11px;" align="center">  <?php echo "$representanteCinvestav"; ?> </td>
-            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$representantePREP"; ?> </td>
-        </tr>
-        <tr>
+            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$cargoINE"; ?> </td>
             <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$cargoCinvestav"; ?> </td>
-            <td style="width:50%;height:auto;font-size: 11px;vertical-align: top;" align="center"> <?php echo "$cargoPREP"; ?> </td>
         </tr>
-</table>
+    </table>
 
 </body> 
 
