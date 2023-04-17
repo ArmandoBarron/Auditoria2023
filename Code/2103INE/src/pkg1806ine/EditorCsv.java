@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author hreyes
+ * @modifier Jbarron
  */
 public class EditorCsv {
 
@@ -21,7 +22,8 @@ public class EditorCsv {
     private String fileName;
 
     //Encabezado
-    private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp";
+    //private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp";
+    private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp, Componente, Veredicto, Apariciones, Padre";
 
     public EditorCsv(String fileName) {
         

@@ -55,7 +55,9 @@
 
 //casos especiales
 $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "BaseDeDatos.sql","Backup.bak","Backup.sql","basededatos.bak","script.sql", "script.bak");
-
+$lista_posibles_cambios = array(" ContainerFile", " Database");
+$lista_archivos_cambiantes = array("hashes_inventario.txt");
+$show_details=False;
 //$lista_BD_condatos = array("Base_de_datos_.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "BaseDeDatos.sql","Backup.bak","Backup.sql","basededatos.bak","basededatos.txt");
 
 ?>
@@ -86,33 +88,42 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
             $total=0;
 
             while (($datos = fgetcsv($fichero,1000,"," )) !== FALSE) {
-                
                 //Se ignora el encabezado
-                if($i!=1){
+                
+                if($i!=1 & count($datos)<=9){
 
-                    echo "<table  autosize='2.4' border='1'>
+                    $path_file = explode("/", $datos[0]);
+                    if (count($path_file)>4){
+                        $namefile = $path_file[0]."/".$path_file[1]."/../".array_slice($path_file, -2, 1)[0]."/".array_slice($path_file, -1, 1)[0];
+                    }
+                    else{
+                        $namefile = $datos[0];
+                    }
+
+                    echo "<table autosize='1' border='1'>
                         <tr>
-                            <th style='width:34.3%;height:auto' align='center' >Nombre del Archivo: $datos[0] </th>
-                            <th style='width:34.3%;height:auto' align='center' >Evento: Proceso Electoral Tamaulipas 2022 Fecha validación $datos[8]</th>
+                            <th style='width:30%;height:auto;' align='center' >Nombre del Archivo: $namefile </th>
+                            <th style='width:70%;height:auto;' align='center' >Evento: Proceso Electoral Tamaulipas 2022 Fecha validación $datos[8]</th>
                         </tr>
                         <tr>
-                            <th style='width:30.0%;height:auto' align='left'>SHA3-256 Inicial</th>
-                            <td style='width:70.0%;height:auto' align='left'>$datos[2]</td>
+                            <th style='width:30%;height:auto' align='left'>SHA3-256 Inicial</th>
+                            <td style='width:70%;height:auto' align='left'>$datos[2]</td>
                         </tr>
                         <tr>
-                            <th style='width:30.0%;height:auto' align='left'>SHA3-256 del evento</th>
-                            <td style='width:70.0%;height:auto' align='left'>$datos[5]</td>
+                            <th style='width:30%;height:auto' align='left'>SHA3-256 del evento</th>
+                            <td style='width:70%;height:auto' align='left'>$datos[5]</td>
                         </tr>
                         <tr>
-                            <th style='width:30.0%;height:auto' align='left'>Estado</th>
-                            <td style='width:70.0%;height:auto' align='left'>";
+                            <th style='width:30%;height:auto' align='left'>Estado</th>
+                            <td style='width:70%;height:auto' align='left'>";
 
                             if(trim($datos[7])=="SI"){
                                 echo "Correcto";
                             }
                             elseif(trim($datos[7])==trim("NO")){
-                                if (in_array($datos[0],$lista_BD)){
+                                if (in_array($datos[0],$lista_archivos_cambiantes)){
                                     echo "<p style='color:#F37D1B';> Con cambios </p>";   
+                                    $show_details=True;
                                 }
                                 else{
                                     $incorrectos= $incorrectos+1;
@@ -123,8 +134,8 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
                     echo        "</td>
                         </tr>
                         <tr>
-                            <th style='width:30.0%;height:auto' align='left'>Observaciones</th>
-                            <td style='width:70.0%;height:auto' align='left'>";
+                            <th style='width:30%;height:auto' align='left'>Observaciones</th>
+                            <td style='width:70%;height:auto' align='left'>";
                          
                             if (trim($datos[7])=="SI"){
 
@@ -134,24 +145,19 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
                                     echo "Se considera correcto porque las huellas criptográficas evaluadas para este archivo son iguales. Las aplicaciones no deben modificarse, por lo tanto se espera que las huellas criptográficas sean iguales.";
                                 }
                             } else {
-                                if (strtoupper($datos[0])=="LOG.TXT"){
-                                    if (($datos[5] == $datos[2])){
-                                        echo "Las huellas criptográficas evaluadas para este archivo son iguales. Se esperaba que fueran diferentes. El contenido de este archivo cambia cada que el proveedor realiza la recolección del inventario, por tal motivo deben ser distintas.";
-                                    } 
-                                } else {
-                                    if (trim($datos[2]) == "N/A" || trim($datos[5]) == "N/A" ){
-                                        echo "Una de las huellas criptográficas no fue obtenida.";
-                                    } 
-                                    if ($datos[5] != $datos[2]){
-                                        if (in_array($datos[0],$lista_BD)){ //si entra en las exepciones
-                                            echo "Las huellas criptograficas son distintas, sin embargo, se espera que para este tipo de archivo pueda ocurrir. Se asume que el archivo original está vacío y el archivo del evento contiene datos. Se espera que el archivo del evento no contenga datos.";   
-                                        }
-                                        else{
-                                            echo "Las huellas criptográficas son distintas. Se esperaba que fueran las mismas para este archivo. Las aplicaciones no deben modificarse, por lo tanto se espera que las huellas criptográficas sean iguales.";
-                                        }
-                                    } 
+
+                                if (str_contains($datos[0], 'Line') ) {
+                                        echo "La linea del archivo de inventario de hashes original es diferente a la del archivo a comparar. Se espera que los archivos sean exactamente iguales.";
                                 }
-                            } 
+                                elseif (trim($datos[2]) == "N/A" || trim($datos[5]) == "N/A" ){
+                                        echo "Una de las huellas criptográficas no fue obtenida.";
+                                } 
+                                else{
+                                    echo "Las huellas criptográficas son distintas. Se esperaba que fueran las mismas para este archivo. Las aplicaciones no deben modificarse, por lo tanto se espera que las huellas criptográficas sean iguales.";
+                                }
+                                
+                                }
+
                             
                             echo "</td>
                         </tr>
@@ -168,32 +174,33 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
             }
 
             if($incorrectos>0){
-                    echo "<p align='justify'>Resumen de la validación: Se detectaron ".$incorrectos."  archivos incorrectos de un total de ".$total." Archivos. Para más detalles revisar el motivo de cada archivo con la validación 'No validado' mismos que están resaltados en color rojo.</p><br>";
+                    echo "<p align='justify'>Resumen de la validación: Se detectaron ".$incorrectos."  archivos incorrectos 
+                    de un total de ".$total." Archivos. Para más detalles revisar el motivo de cada archivo con la validación 
+                    'No validado' mismos que están resaltados en color rojo. Los detalles se muestran en el documento anexo.</p><br>";
             }
         } 
+        ?>
 
-    ?>
-
-
-    <p align='justify'>A continuación, se describe brevemente cada uno de los archivos validados.</p>
+        <p align='justify'>A continuación, se describe brevemente cada uno de los archivos validados.</p>
     
-    <table  autosize="2.4" border="1">
-        <tr>
-            <th style="width:34.3%;height:auto" align="center" >Nombre</th>
-            <th style="width:34.3%;height:auto" align="center" >Descripción</th>
-        </tr>
-        <tr>
-            <td style="width:34.3%;height:auto" >hashes.sh</td>
-            <td style="width:34.3%;height:auto">Script de generacion de hash de los componentes que se encuentran en la infraestructura.</td>
-        </tr>
-        <tr>
-            <td style="width:34.3%;height:auto" >hashes_inventario.txt</td>
-            <td style="width:34.3%;height:auto">Lista de hashes generada por la aplicacion hashes.sh.</td>
-        </tr>
-    </table>
+        <table  autosize="2.4" border="1">
+            <tr>
+                <th style="width:34.3%;height:auto" align="center" >Nombre</th>
+                <th style="width:34.3%;height:auto" align="center" >Descripción</th>
+            </tr>
+            <tr>
+                <td style="width:34.3%;height:auto" >hashes.sh</td>
+                <td style="width:34.3%;height:auto">Script de generacion de hash de los componentes que se encuentran en la infraestructura.</td>
+            </tr>
+            <tr>
+                <td style="width:34.3%;height:auto" >hashes_inventario.txt</td>
+                <td style="width:34.3%;height:auto">Lista de hashes generada por la aplicacion hashes.sh.</td>
+            </tr>
+        </table>
+        
 
 
-    <p align='justify'>Firman la presente constancia los representantes de las entidades que intervienen, en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez
+        <p align='justify'>Firman la presente constancia los representantes de las entidades que intervienen, en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez
     </p>
 
 
@@ -216,8 +223,112 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
         </tr>
     </table>
 
-</body> 
+    <div style='page-break-after:always'></div>
 
+
+        <?php
+        
+        if ($show_details){
+            $incorrectos=0;
+            $contenedores=0;
+            $bases_de_datos=0;
+            $i=1;
+            $total= 0;
+            $fichero = fopen($_FILES['archivo']['tmp_name'], "r");
+            echo "<h3 align='center'>Anexo 1. Cambios en Hashes_inventario.txt</h3>";
+            echo"<p align='justify'>Se detectaron cambios en el archivo Hashes_invetario.txt. A continuación, se muestran los componentes detallados acompañados del nombre del archivo, la huella criptográfica original (SHA3-256 inicial), la huella criptográfica del evento, y las observaciones realizadas.</p><br>";
+            while (($datos = fgetcsv($fichero,1000,"," )) !== FALSE) {
+                
+                if($i!=1 & count($datos)>=10){//Se ignora el encabezado
+                    $path_file = explode("/", $datos[0]);
+                    if (count($path_file)>4){
+                        $namefile = $path_file[0]."/".$path_file[1]."/../".array_slice($path_file, -2, 1)[0]."/".array_slice($path_file, -1, 1)[0];
+                    }
+                    else{
+                        $namefile = $datos[0];
+                    }
+
+                    echo "<table autosize='1' border='1'>
+                        <tr>
+                            <th style='width:30%;height:auto;' align='center' >Nombre del Archivo: </th>
+                            <th style='width:70%;height:auto;' align='center' > $namefile</th>
+                        </tr>
+                        <tr>
+                            <th style='width:30%;height:auto' align='left'>SHA3-256 Inicial</th>
+                            <td style='width:70%;height:auto' align='left'>$datos[2]</td>
+                        </tr>
+                        <tr>
+                            <th style='width:30%;height:auto' align='left'>SHA3-256 del evento</th>
+                            <td style='width:70%;height:auto' align='left'>$datos[5]</td>
+                        </tr>
+                        <tr>
+                            <th style='width:30%;height:auto' align='left'>Estado</th>
+                            <td style='width:70%;height:auto' align='left'>";
+
+                            if(trim($datos[7])=="SI"){
+                                echo "Correcto";
+                            }
+                            elseif(trim($datos[7])==trim("NO")){
+                                if (in_array($datos[9],$lista_posibles_cambios)){
+                                    echo "<p style='color:#F37D1B';> Con cambios </p>";   
+                                    if($datos[9]==" Database"){
+                                        $contenedores=$contenedores+1;
+                                    }
+                                    else{
+                                        $bases_de_datos = $bases_de_datos+1;
+                                    }
+                                }
+                                else{
+                                    $incorrectos= $incorrectos+1;
+                                    echo "<p style='color:#FF0000';> No validado </p>";   
+                                }
+                            }
+                            
+                        echo "</td>
+                        </tr>
+                        <tr>
+                            <th style='width:30%;height:auto' align='left'>Observaciones</th>
+                            <td style='width:70%;height:auto' align='left'>";
+                    
+                                    echo $datos[10];
+                            
+                        echo "</td>
+                        </tr>
+                        <tr>
+                            <th style='width:30%;height:auto' align='left'>Fecha: </th>
+                            <td style='width:70%;height:auto' align='left'> $datos[8]</td>
+                        </tr>
+                        
+                        </table>";
+                }
+                $i=$i+1;   
+                $total= $total+1;
+            }
+
+
+            if($contenedores+$bases_de_datos >0 ){
+                echo "<p align='justify'>Resumen de la validación: De un total de ".$total." Archivos con cambios detectados, 
+                se encontraron ".$contenedores." archivos que pertenecen a contenedores virtuales y ".$bases_de_datos." que pertenecen a bases de datos, 
+                dando un total de ".$bases_de_datos+$contenedores." archivos de los 
+                cuales se espera que puedan presentar cambios debido a su naturaleza volátil. </p>";
+            }
+
+            if($incorrectos>0){
+                echo "<p align='justify'> No obstante, se detectaron ".$incorrectos." archivos incorrectos cuyos cuales 
+                no se espera que tengan alteraciones. Para más detalles revisar 
+                el motivo de cada archivo con la validación 'No validado' mismos que están resaltados en color rojo. </p><br>";
+            }
+        }
+        
+    
+
+    ?>
+
+
+   
+
+
+</body> 
 </html>
 <?php
     ini_set("display_errors", "1");
@@ -225,9 +336,11 @@ $lista_BD = array("Base_de_datos.bak", "Base_de_datos.sql", "BaseDeDatos.bak", "
     $mpdf = new \Mpdf\Mpdf();
     $html = ob_get_contents();
     ob_end_clean();
+    $mpdf->shrink_tables_to_fit=0;
     $mpdf->WriteHTML($html);
     //$mpdf->Output();
     $nombrePdf = $anio.$mes.$dia."_".$hora."_".$min."_ConstanciaHechos.pdf";
+
     $mpdf->Output($nombrePdf,'I');
 ?>
 

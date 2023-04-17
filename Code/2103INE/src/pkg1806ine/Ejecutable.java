@@ -5,6 +5,8 @@
  */
 package pkg1806ine;
 
+import java.io.IOException;
+
 /**
  *
  * @author hreyes
@@ -14,7 +16,7 @@ public class Ejecutable {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO code application logic here
         
         if(args.length != 4){
