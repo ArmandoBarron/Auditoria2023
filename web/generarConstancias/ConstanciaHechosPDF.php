@@ -78,11 +78,35 @@ $show_details=False;
         
         <p align='justify'>Para esta validación se contó con la presencia en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez.
         </p>";
+    ?>
     
+        <p align='justify'>A continuación, se describe brevemente cada uno de los archivos sujetos a validacion.</p>
     
+        <table  autosize="2.4" border="1">
+            <tr>
+                <th style="width:34.3%;height:auto" align="center" >Nombre</th>
+                <th style="width:34.3%;height:auto" align="center" >Descripción</th>
+            </tr>
+            <tr>
+                <td style="width:34.3%;height:auto" >hashes.sh</td>
+                <td style="width:34.3%;height:auto">Script de generacion de hash de los componentes que se encuentran en la infraestructura.</td>
+            </tr>
+            <tr>
+                <td style="width:34.3%;height:auto" >hashes_inventario.txt</td>
+                <td style="width:34.3%;height:auto">Lista de hashes generada por la aplicacion hashes.sh.</td>
+            </tr>
+        </table>
+        
+        <?php
         /* Se Genera la tabla*/
         if (($fichero = fopen($_FILES['archivo']['tmp_name'], "r")) !== FALSE) {
-            echo"<p align='justify'>A continuación, se muestran los componentes sujetos a este procedimiento, acompañados del nombre del archivo, la huella criptográfica original (SHA3-256 inicial), la huella criptográfica minutos antes de iniciar la jornada electoral (SHA3-256 inicial) y el resultado de la comparación.</p><br>";
+            echo "<p align='justify'>Los resultados de la comprobacion de las huellas criptograficas se muestran en la siguiente tabla, acompañados del nombre del archivo, 
+            la huella criptográfica original (SHA3-256 inicial), 
+            la huella criptográfica minutos antes de iniciar la jornada electoral (SHA3-256 inicial) y el resultado de la comparación, siendo estos clasificados como <b> Correctos </b> 
+            cuando las huellas criptograficas son iguales, <span style='color:#F37D1B';> Con cambios </span> cuando las huellas criptograficas son distintas en un componente considerado como dinámico 
+            (e.g. Base de datos), y <span style='color:#FF0000';> No válidado </span>
+            cuando las huellas criptograficas son distintas y cuyo componente no se espera pueda presentar cambios.</p><br>";
+
             $i=1;
             $incorrectos=0;
             $total=0;
@@ -127,7 +151,7 @@ $show_details=False;
                                 }
                                 else{
                                     $incorrectos= $incorrectos+1;
-                                    echo "<p style='color:#FF0000';> No validado </p>";   
+                                    echo "<p style='color:#FF0000';> No válidado </p>";   
                                 }
                             }
                             
@@ -167,42 +191,22 @@ $show_details=False;
                 }
 
                  
-                $i=$i+1;                
+                $i=$i+1;                 
 
                 
                     
             }
 
             if($incorrectos>0){
-                    echo "<p align='justify'>Resumen de la validación: Se detectaron ".$incorrectos."  archivos incorrectos 
+                    echo "<p align='justify'>Resumen de la validación:Se detectaron ".$incorrectos."  archivos incorrectos 
                     de un total de ".$total." Archivos. Para más detalles revisar el motivo de cada archivo con la validación 
                     'No validado' mismos que están resaltados en color rojo. Los detalles se muestran en el documento anexo.</p><br>";
             }
         } 
         ?>
 
-        <p align='justify'>A continuación, se describe brevemente cada uno de los archivos validados.</p>
-    
-        <table  autosize="2.4" border="1">
-            <tr>
-                <th style="width:34.3%;height:auto" align="center" >Nombre</th>
-                <th style="width:34.3%;height:auto" align="center" >Descripción</th>
-            </tr>
-            <tr>
-                <td style="width:34.3%;height:auto" >hashes.sh</td>
-                <td style="width:34.3%;height:auto">Script de generacion de hash de los componentes que se encuentran en la infraestructura.</td>
-            </tr>
-            <tr>
-                <td style="width:34.3%;height:auto" >hashes_inventario.txt</td>
-                <td style="width:34.3%;height:auto">Lista de hashes generada por la aplicacion hashes.sh.</td>
-            </tr>
-        </table>
-        
-
-
         <p align='justify'>Firman la presente constancia los representantes de las entidades que intervienen, en su calidad de titular de la Dirección de Seguridad y Control Informático de la Unidad Técnica de Servicios de Informática el Ing. Yuri Adrián González Robles por parte del INE; por parte del CINVESTAV en su calidad de Ente Auditor el Investigador Titular Dr. Arturo Díaz Pérez
     </p>
-
 
 <br>
 <br>
@@ -227,7 +231,7 @@ $show_details=False;
 
 
         <?php
-        
+        $html_table = "";
         if ($show_details){
             $incorrectos=0;
             $contenedores=0;
@@ -235,8 +239,7 @@ $show_details=False;
             $i=1;
             $total= 0;
             $fichero = fopen($_FILES['archivo']['tmp_name'], "r");
-            echo "<h3 align='center'>Anexo 1. Cambios en Hashes_inventario.txt</h3>";
-            echo"<p align='justify'>Se detectaron cambios en el archivo Hashes_invetario.txt. A continuación, se muestran los componentes detallados acompañados del nombre del archivo, la huella criptográfica original (SHA3-256 inicial), la huella criptográfica del evento, y las observaciones realizadas.</p><br>";
+            
             while (($datos = fgetcsv($fichero,1000,"," )) !== FALSE) {
                 
                 if($i!=1 & count($datos)>=10){//Se ignora el encabezado
@@ -248,7 +251,7 @@ $show_details=False;
                         $namefile = $datos[0];
                     }
 
-                    echo "<table autosize='1' border='1'>
+                    $html_table = $html_table. "<table autosize='1' border='1'>
                         <tr>
                             <th style='width:30%;height:auto;' align='center' >Nombre del Archivo: </th>
                             <th style='width:70%;height:auto;' align='center' > $namefile</th>
@@ -266,11 +269,11 @@ $show_details=False;
                             <td style='width:70%;height:auto' align='left'>";
 
                             if(trim($datos[7])=="SI"){
-                                echo "Correcto";
+                                $html_table = $html_table. "Correcto";
                             }
                             elseif(trim($datos[7])==trim("NO")){
                                 if (in_array($datos[9],$lista_posibles_cambios)){
-                                    echo "<p style='color:#F37D1B';> Con cambios </p>";   
+                                    $html_table = $html_table. "<p style='color:#F37D1B';> Con cambios </p>";   
                                     if($datos[9]==" Database"){
                                         $contenedores=$contenedores+1;
                                     }
@@ -280,19 +283,19 @@ $show_details=False;
                                 }
                                 else{
                                     $incorrectos= $incorrectos+1;
-                                    echo "<p style='color:#FF0000';> No validado </p>";   
+                                    $html_table = $html_table. "<p style='color:#FF0000';> No validado </p>";   
                                 }
                             }
                             
-                        echo "</td>
+                            $html_table = $html_table. "</td>
                         </tr>
                         <tr>
                             <th style='width:30%;height:auto' align='left'>Observaciones</th>
                             <td style='width:70%;height:auto' align='left'>";
                     
-                                    echo $datos[10];
+                            $html_table = $html_table. $datos[10];
                             
-                        echo "</td>
+                            $html_table = $html_table. "</td>
                         </tr>
                         <tr>
                             <th style='width:30%;height:auto' align='left'>Fecha: </th>
@@ -305,19 +308,27 @@ $show_details=False;
                 $total= $total+1;
             }
 
-
+            echo "<h3 align='center'>Anexo 1. Cambios en Hashes_inventario.txt</h3>";
+            echo "<p align='justify'>Se realizó un proceso de validacion de huellas criptograficas a grano fino de los hashes contenidos dentro del archivo Hases_inventario.txt.
+            Dicha validación consistió en la extracción de los hashes de los archivos Hashes_inventario.txt de cada uno de los eventos, posteriormente se realizó la construccion de 2 tablas 
+            de hash (donde cada registro corresponde a la ruta de un archivo y su huella criptografica listadas dentro de los archivos Hashes_inventario.txt), y finalmente se 
+            realizó la comparacion entre los contenidos de las tablas.  
+            </p>";
             if($contenedores+$bases_de_datos >0 ){
-                echo "<p align='justify'>Resumen de la validación: De un total de ".$total." Archivos con cambios detectados, 
-                se encontraron ".$contenedores." archivos que pertenecen a contenedores virtuales y ".$bases_de_datos." que pertenecen a bases de datos, 
+                echo "<p align='justify'>De un total de ".$total." rutas de archivos con cambios detectados dentro de Hashes_inventario.txt, 
+                se encontraron ".$contenedores." rutas de archivos que pertenecen a contenedores virtuales y ".$bases_de_datos." que pertenecen a bases de datos, 
                 dando un total de ".$bases_de_datos+$contenedores." archivos de los 
-                cuales se espera que puedan presentar cambios debido a su naturaleza volátil. </p>";
+                cuales se espera que puedan presentar cambios, por lo cual fueron clasificados como <span style='color:#F37D1B';> Con cambios </span>. </p>";
             }
 
             if($incorrectos>0){
-                echo "<p align='justify'> No obstante, se detectaron ".$incorrectos." archivos incorrectos cuyos cuales 
-                no se espera que tengan alteraciones. Para más detalles revisar 
-                el motivo de cada archivo con la validación 'No validado' mismos que están resaltados en color rojo. </p><br>";
+                echo "<p align='justify'>No obstante, se detactaron un total de ".$incorrectos." rutas de archivos cuyo estatus fue denominado como 'No validado' 
+                debido a que las huella criptografica no son similares. Para más detalles, a continuación se muestra la tabla de 
+                hallazgos encontrados en la cual se resaltan los componentes marcados como <span style='color:#FF0000';> No válidado </span> </p><br>";
+                echo $html_table;
             }
+
+
         }
         
     
