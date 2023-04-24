@@ -39,8 +39,9 @@ Este manual contiene los comandos requerios para realizar la ejecución de la ap
    java -jar 2103Auditor.jar S1-Final 
    
    #Simulacro 2
+   java -jar 2103Auditor.jar S2-Original.json
    #Cargar JSON inicial
-   java -jar 2103Auditor.jar S2-Inicio
+   java -jar 2103Auditor.jar S2-Inicial.json
    #Cargar JSON intermedio
    java -jar 2103Auditor.jar S2-Intermedio 
    #Cargar JSON final

@@ -36,6 +36,8 @@ Este manual contiene los comandos requerios para realizar la ejecución de la ap
 
    ```bash
    #Verificaciones del Simulacro 1
+ 
+
    #Firmas iniciales con firmas intermedias
    java -jar 2103INE.jar validar Llavero/LlavePublica S1-Inicio S1-Intermedio
    
@@ -43,6 +45,8 @@ Este manual contiene los comandos requerios para realizar la ejecución de la ap
    java -jar 2103INE.jar validar Llavero/LlavePublica S1-Inicio S1-Final
    
    #Verificaciones del Simulacro 2
+  java -jar 2103INE.jar validar Llavero/LlavePublica S2-Original S2-Inicial
+
    #Firmas iniciales con firmas intermedias
    java -jar 2103INE.jar validar Llavero/LlavePublica S2-Inicio S2-Intermedio
    

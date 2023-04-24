@@ -127,7 +127,7 @@ $show_details=False;
                     echo "<table autosize='1' border='1'>
                         <tr>
                             <th style='width:30%;height:auto;' align='center' >Nombre del Archivo: $namefile </th>
-                            <th style='width:70%;height:auto;' align='center' >Evento: Proceso Electoral Tamaulipas 2022 Fecha validación $datos[8]</th>
+                            <th style='width:70%;height:auto;' align='center' >Evento: Proceso Electoral 2023 Fecha validación $datos[8]</th>
                         </tr>
                         <tr>
                             <th style='width:30%;height:auto' align='left'>SHA3-256 Inicial</th>
@@ -238,10 +238,13 @@ $show_details=False;
             $bases_de_datos=0;
             $i=1;
             $total= 0;
+            $total_archivos=0;
+            $porcentaje_Archivos_faltantes=0;
+            $conteos_erroneos=0;
             $fichero = fopen($_FILES['archivo']['tmp_name'], "r");
-            
-            while (($datos = fgetcsv($fichero,1000,"," )) !== FALSE) {
-                
+            $index=1;
+            while (($datos = fgetcsv($fichero,5000,"," )) !== FALSE) {
+
                 if($i!=1 & count($datos)>=10){//Se ignora el encabezado
                     $path_file = explode("/", $datos[0]);
                     if (count($path_file)>4){
@@ -251,9 +254,13 @@ $show_details=False;
                         $namefile = $datos[0];
                     }
 
+                    if ($datos[13]!=""){
+                        $total_archivos = $datos[13];
+                    }
+
                     $html_table = $html_table. "<table autosize='1' border='1'>
                         <tr>
-                            <th style='width:30%;height:auto;' align='center' >Nombre del Archivo: </th>
+                            <th style='width:30%;height:auto;' align='center' >".$index.".- Nombre del Archivo: </th>
                             <th style='width:70%;height:auto;' align='center' > $namefile</th>
                         </tr>
                         <tr>
@@ -275,15 +282,21 @@ $show_details=False;
                                 if (in_array($datos[9],$lista_posibles_cambios)){
                                     $html_table = $html_table. "<p style='color:#F37D1B';> Con cambios </p>";   
                                     if($datos[9]==" Database"){
-                                        $contenedores=$contenedores+1;
+                                        $bases_de_datos = $bases_de_datos+1;
                                     }
                                     else{
-                                        $bases_de_datos = $bases_de_datos+1;
+                                        $contenedores=$contenedores+1;
                                     }
                                 }
                                 else{
-                                    $incorrectos= $incorrectos+1;
-                                    $html_table = $html_table. "<p style='color:#FF0000';> No validado </p>";   
+                                    if (str_contains($datos[10], 'conteo')){
+                                        $html_table = $html_table. "<p style='color:#F37D1B';> Con cambios </p>"; 
+                                        $conteos_erroneos = $conteos_erroneos +1;
+                                    }
+                                    else{
+                                        $incorrectos= $incorrectos+1;
+                                        $html_table = $html_table. "<p style='color:#FF0000';> No validado </p>";  
+                                    }
                                 }
                             }
                             
@@ -303,10 +316,16 @@ $show_details=False;
                         </tr>
                         
                         </table>";
+                    $total= $total+1;
+                    $index = $index+1;
                 }
+
                 $i=$i+1;   
-                $total= $total+1;
+
             }
+
+            $porcentaje_Archivos_faltantes = ($total*100) / $total_archivos;
+            $porcentaje_incorrectos = ($incorrectos*100) / $total_archivos;
 
             echo "<h3 align='center'>Anexo 1. Cambios en Hashes_inventario.txt</h3>";
             echo "<p align='justify'>Se realizó un proceso de validacion de huellas criptograficas a grano fino de los hashes contenidos dentro del archivo Hases_inventario.txt.
@@ -314,16 +333,16 @@ $show_details=False;
             de hash (donde cada registro corresponde a la ruta de un archivo y su huella criptografica listadas dentro de los archivos Hashes_inventario.txt), y finalmente se 
             realizó la comparacion entre los contenidos de las tablas.  
             </p>";
-            if($contenedores+$bases_de_datos >0 ){
-                echo "<p align='justify'>De un total de ".$total." rutas de archivos con cambios detectados dentro de Hashes_inventario.txt, 
-                se encontraron ".$contenedores." rutas de archivos que pertenecen a contenedores virtuales y ".$bases_de_datos." que pertenecen a bases de datos, 
-                dando un total de ".$bases_de_datos+$contenedores." archivos de los 
+            if($contenedores+$bases_de_datos+$conteos_erroneos >0 ){
+                echo "<p align='justify'>De un total de ".$total." rutas de archivos con cambios (aproximadamente el ".round($porcentaje_Archivos_faltantes)    ."% del total de ".$total_archivos." archivos unicos) detectados dentro de Hashes_inventario.txt, 
+                se encontraron ".$contenedores." rutas de archivos que pertenecen a contenedores virtuales, ".$bases_de_datos." que pertenecen a bases de datos y ".$conteos_erroneos." que
+                presentan inconsistencias en la cantidad de archivos con el mismo hash, dando un total de ".$bases_de_datos+$contenedores+$conteos_erroneos." archivos de los 
                 cuales se espera que puedan presentar cambios, por lo cual fueron clasificados como <span style='color:#F37D1B';> Con cambios </span>. </p>";
             }
 
             if($incorrectos>0){
-                echo "<p align='justify'>No obstante, se detactaron un total de ".$incorrectos." rutas de archivos cuyo estatus fue denominado como 'No validado' 
-                debido a que las huella criptografica no son similares. Para más detalles, a continuación se muestra la tabla de 
+                echo "<p align='justify'>No obstante, se detactaron un total de ".$incorrectos." rutas de archivos (".round($porcentaje_incorrectos)."% del total de archivos unicos) cuyo estatus fue denominado como 'No validado' 
+                debido a que las huellas criptograficas no son similares. A continuación se muestra la tabla de 
                 hallazgos encontrados en la cual se resaltan los componentes marcados como <span style='color:#FF0000';> No válidado </span> </p><br>";
                 echo $html_table;
             }

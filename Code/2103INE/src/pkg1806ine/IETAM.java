@@ -309,7 +309,7 @@ public class IETAM {
         Iterator iterator = ListaO.keySet().iterator(); 
         List<String> ToDelete = new ArrayList<String>();
         List<String> ToDeleteE = new ArrayList<String>();
-
+        int cantidad_archivos = ListaO.keySet().size();
         while(iterator.hasNext()) {
             String key = (String) iterator.next();
             //System.out.println("validando "+ key);
@@ -331,7 +331,7 @@ public class IETAM {
                 if (counterO > counterE || counterE > counterO){ // hay mas lineas en el original, por lo que no coinciden
                     
                     String razon_rechazo = "El conteo de hash no coincide. El hash se repite "+counterO+" en el archivo original y "+counterE+" en el archivo del evento.";
-                    NuevaLinea = CrearLinea(path, Ciudad, key, key, NombreEvento, componente, razon_rechazo,counterO);
+                    NuevaLinea = CrearLinea(path, Ciudad, key, key, NombreEvento, componente, razon_rechazo,counterO,cantidad_archivos);
                     pointer_csv.escribirLinea(NuevaLinea);
                 }
 
@@ -367,12 +367,12 @@ public class IETAM {
                     if("File".equals(OriginalComponente)){razon_rechazo="No se encontró el archivo";}
                     else{razon_rechazo="No se encontró el contenedor";}
                     
-                    NuevaLinea = CrearLinea(OriginalPath, Ciudad, key, "", NombreEvento, OriginalComponente, razon_rechazo, conteo_aparciones);
+                    NuevaLinea = CrearLinea(OriginalPath, Ciudad, key, "", NombreEvento, OriginalComponente, razon_rechazo, conteo_aparciones, cantidad_archivos);
                     ToDelete.add(key);
                 }
                 else{
                 String razon_rechazo="los hash no coinciden.";
-                    NuevaLinea = CrearLinea(OriginalPath, Ciudad, key, match, NombreEvento, OriginalComponente, razon_rechazo,conteo_aparciones);
+                    NuevaLinea = CrearLinea(OriginalPath, Ciudad, key, match, NombreEvento, OriginalComponente, razon_rechazo,conteo_aparciones,cantidad_archivos);
                     ToDelete.add(key);
                     ToDeleteE.add(match);
                 }
@@ -404,14 +404,14 @@ public class IETAM {
             int conteo_aparciones = (int) temp_obj_event.get("count");
 
             String razon_rechazo = "No se encontró un hash similar en el archivo original.";
-            String NuevaLinea = CrearLinea(path, Ciudad, "", keyE, NombreEvento, component, razon_rechazo,conteo_aparciones);
+            String NuevaLinea = CrearLinea(path, Ciudad, "", keyE, NombreEvento, component, razon_rechazo,conteo_aparciones,cantidad_archivos);
             pointer_csv.escribirLinea(NuevaLinea);
 
             
         }
     }
     
-    private String CrearLinea(String Nombre, String Ciudad,String HashO, String HashE, String NombreEvento,String Componente,String reason,int Conteo){
+    private String CrearLinea(String Nombre, String Ciudad,String HashO, String HashE, String NombreEvento,String Componente,String reason,int Conteo, int total){
         String AgregarLinea="";
         AgregarLinea =  Nombre+", " + Ciudad + ", ";
         AgregarLinea += HashO+", OK, ";
@@ -419,6 +419,8 @@ public class IETAM {
         AgregarLinea += HashE+", OK, NO, ";
         AgregarLinea += new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime())+", ";
         AgregarLinea += Componente+", "+reason+", "+Conteo+", hashes_inventario.txt";
+        AgregarLinea += ", "+total;
+
 
 
         return AgregarLinea;

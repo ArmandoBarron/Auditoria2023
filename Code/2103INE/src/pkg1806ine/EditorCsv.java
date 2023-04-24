@@ -23,7 +23,7 @@ public class EditorCsv {
 
     //Encabezado
     //private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp";
-    private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp, Componente, Veredicto, Apariciones, Padre";
+    private static final String FILE_HEADER = "NombreArchivo, NombreCiudad, SHA256Original, Firma Original, Nombre del Evento, SHA256Evento, Firma Evento, Verificación Integridad, Timestamp, Componente, Veredicto, Apariciones, Padre, Total";
 
     public EditorCsv(String fileName) {
         
